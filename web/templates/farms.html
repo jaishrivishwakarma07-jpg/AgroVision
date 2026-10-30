@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Management | AGROVISION</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f7f0; padding: 24px; color: #243426; }
+        .container { max-width: 1100px; margin: auto; }
+        .panel { background: white; padding: 22px; border-radius: 12px; margin-bottom: 20px; }
+        h1 { color: #276738; }
+        .btn { display: inline-block; padding: 9px 14px; border: 0; border-radius: 6px; background: #276738; color: white; text-decoration: none; cursor: pointer; }
+        .delete { background: #b42318; }
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #e1e8dd; text-align: left; }
+        th { background: #eaf2e6; }
+        .table-wrap { overflow-x: auto; }
+        .message { padding: 10px; background: #eaf2e6; margin: 8px 0; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <section class="panel">
+        <h1>🌱 AGROVISION</h1>
+        <h2>Farm Management</h2>
+        <p>Manage farms and link each farm to a registered farmer.</p>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('dashboard_page') }}">← Dashboard</a>
+            <a class="btn" href="{{ url_for('add_farm') }}">+ Add Farm</a>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </section>
+
+    <section class="panel">
+        <h2>Total Farms: {{ farms|length }}</h2>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farm ID</th>
+                    <th>Farm Name</th>
+                    <th>Farmer</th>
+                    <th>Land Area</th>
+                    <th>Soil Type</th>
+                    <th>Village</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for farm in farms %}
+                {% set owner = namespace(name='Unknown') %}
+                {% for f in farmers %}
+                    {% if f.get('farmer_id') == farm.get('farmer_id') %}
+                        {% set owner.name = f.get('name', 'Unknown') %}
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>{{ farm.get('farm_id', '') }}</td>
+                    <td>{{ farm.get('farm_name', '') }}</td>
+                    <td>{{ owner.name }}</td>
+                    <td>{{ farm.get('land_area', '') }}</td>
+                    <td>{{ farm.get('soil_type', '') }}</td>
+                    <td>{{ farm.get('village', '') }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn" href="{{ url_for('edit_farm', farm_id=farm.get('farm_id', '')) }}">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_farm', farm_id=farm.get('farm_id', '')) }}" onsubmit="return confirm('Delete this farm?');">
+                                <button class="btn delete" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7">No farm records found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

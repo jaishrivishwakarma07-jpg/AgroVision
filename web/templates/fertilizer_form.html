@@ -1,0 +1,157 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Fertilizer Recommendation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f0;
+            color: #243b2b;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+            padding: 28px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #246b3c;
+        }
+
+        .subtitle {
+            color: #667568;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccd7ce;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button, .back-link {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #267443;
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .back-link {
+            margin-left: 8px;
+            background: #59675d;
+        }
+
+        button:hover, .back-link:hover {
+            opacity: 0.9;
+        }
+
+        .note {
+            margin-top: 18px;
+            font-size: 13px;
+            color: #667568;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌱 AGROVISION</h1>
+        <h2>Fertilizer Recommendation</h2>
+        <p class="subtitle">Enter fertilizer recommendation details.</p>
+
+        <form method="POST">
+            <label for="farm_id">Farm ID</label>
+            <input type="text" id="farm_id" name="farm_id"
+                   placeholder="Enter farm ID">
+
+            <label for="crop_name">Crop Name</label>
+            <input type="text" id="crop_name" name="crop_name"
+                   placeholder="Enter crop name" required>
+
+            <label for="soil_type">Soil Type</label>
+            <select id="soil_type" name="soil_type">
+                <option value="">Select soil type</option>
+                <option value="Loamy">Loamy</option>
+                <option value="Clay">Clay</option>
+                <option value="Sandy">Sandy</option>
+                <option value="Silty">Silty</option>
+                <option value="Black">Black</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="nitrogen">Nitrogen (N)</label>
+            <input type="number" id="nitrogen" name="nitrogen"
+                   min="0" step="any" placeholder="Enter nitrogen value">
+
+            <label for="phosphorus">Phosphorus (P)</label>
+            <input type="number" id="phosphorus" name="phosphorus"
+                   min="0" step="any" placeholder="Enter phosphorus value">
+
+            <label for="potassium">Potassium (K)</label>
+            <input type="number" id="potassium" name="potassium"
+                   min="0" step="any" placeholder="Enter potassium value">
+
+            <label for="fertilizer_name">Recommended Fertilizer</label>
+            <input type="text" id="fertilizer_name" name="fertilizer_name"
+                   placeholder="Enter fertilizer name">
+
+            <label for="quantity">Recommended Quantity</label>
+            <input type="text" id="quantity" name="quantity"
+                   placeholder="Enter quantity and unit">
+
+            <label for="schedule">Application Schedule</label>
+            <input type="text" id="schedule" name="schedule"
+                   placeholder="Enter application schedule">
+
+            <label for="notes">Additional Notes</label>
+            <textarea id="notes" name="notes"
+                      placeholder="Enter additional details"></textarea>
+
+            <button type="submit">Save Fertilizer Record</button>
+            <a class="back-link" href="{{ url_for('dashboard_page') }}">
+                Back to Dashboard
+            </a>
+        </form>
+
+        <p class="note">
+            Note: This form records the details entered. It does not
+            independently calculate an AI fertilizer recommendation.
+        </p>
+    </div>
+</body>
+</html>
+```

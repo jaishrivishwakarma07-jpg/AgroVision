@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION - Irrigation Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f7f2;
+            color: #24352a;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            margin: 18px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 9px #00000010;
+        }
+
+        h1, h2 {
+            color: #246b3c;
+        }
+
+        input, button, select, textarea {
+            padding: 11px;
+            border-radius: 6px;
+            border: 1px solid #cbd5cc;
+            font-size: 15px;
+        }
+
+        button {
+            background: #246b3c;
+            color: white;
+            cursor: pointer;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            background: #eef7ee;
+            border-radius: 9px;
+            padding: 16px;
+        }
+
+        .value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .muted {
+            color: #66756a;
+            font-size: 13px;
+        }
+
+        .advice {
+            background: #fff8df;
+            border-left: 5px solid #d5a52b;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .error {
+            color: #a32222;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e3e8e3;
+        }
+
+        th {
+            background: #eef7ee;
+            color: #246b3c;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        a {
+            color: #246b3c;
+        }
+
+        .add-btn {
+            display: inline-block;
+            background: #246b3c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            background: #e8f2e8;
+            color: #246b3c;
+            padding: 7px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        .delete-btn {
+            background: #b42318;
+            color: white;
+            padding: 7px 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .weather-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .panel {
+                padding: 14px;
+            }
+
+            .weather-form input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <p>
+        <a href="{{ url_for('dashboard_page') }}">← Back to Dashboard</a>
+    </p>
+
+    <h1>💧 Irrigation Management</h1>
+    <p>Weather-based irrigation guidance for AGROVISION farmers.</p>
+
+    <!-- LIVE WEATHER ADVICE -->
+    <div class="panel">
+        <h2>Live Weather Advice</h2>
+        <p>Enter a city to check current weather and the next forecast period.</p>
+
+        <form method="GET"
+              action="{{ url_for('irrigation_management_web') }}"
+              class="weather-form">
+
+            <input type="text"
+                   name="city"
+                   value="{{ city }}"
+                   placeholder="Enter city, e.g. Delhi"
+                   required>
+
+            <button type="submit">Get Irrigation Advice</button>
+        </form>
+
+        {% if weather_error %}
+            <p class="error">{{ weather_error }}</p>
+        {% endif %}
+
+        {% if live_weather %}
+            <div class="grid" style="margin-top: 20px;">
+
+                <div class="metric">
+                    <div>City</div>
+                    <div class="value">
+                        {{ live_weather.get('city', city) }}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div>Temperature</div>
+                    <div class="value">
+                        {% if live_weather.get('temperature') is not none %}
+                            {{ live_weather.get('temperature') }} °C
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div>Rain Chance</div>
+                    <div class="value">
+                        {% if live_weather.get('rain_chance') is not none %}
+                            {{ live_weather.get('rain_chance') }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div>Forecast Rainfall</div>
+                    <div class="value">
+                        {% if live_weather.get('forecast_rainfall') is not none %}
+                            {{ live_weather.get('forecast_rainfall') }} mm
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div>Humidity</div>
+                    <div class="value">
+                        {% if live_weather.get('humidity') is not none %}
+                            {{ live_weather.get('humidity') }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div>Wind Speed</div>
+                    <div class="value">
+                        {% if live_weather.get('wind_speed') is not none %}
+                            {{ live_weather.get('wind_speed') }} m/s
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="muted">
+                Forecast period:
+                {{ live_weather.get('forecast_period') or 'Not available' }}
+            </p>
+
+            {% if advice %}
+                <div class="advice">
+                    <strong>Irrigation Recommendation</strong>
+                    <p>{{ advice }}</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- SOIL MOISTURE RECORDS -->
+    <div class="panel">
+        <h2>Soil Moisture Records</h2>
+
+        {% if soil_records %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Soil ID</th>
+                            <th>Farm ID</th>
+                            <th>Soil Type</th>
+                            <th>Moisture</th>
+                            <th>Temperature</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for soil in soil_records %}
+                            <tr>
+                                <td>{{ soil.get('soil_id', 'N/A') }}</td>
+                                <td>{{ soil.get('farm_id', 'N/A') }}</td>
+                                <td>{{ soil.get('soil_type', 'N/A') }}</td>
+                                <td>{{ soil.get('moisture', 'N/A') }}</td>
+                                <td>{{ soil.get('temperature', 'N/A') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>
+                No soil records available yet. Add soil moisture data in
+                Soil Management for more informed decisions.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- SAVED IRRIGATION RECORDS -->
+    <div class="panel">
+        <h2>Saved Irrigation Records</h2>
+
+        <a class="add-btn"
+           href="{{ url_for('add_irrigation_web') }}">
+            + Add Irrigation
+        </a>
+
+        {% if irrigation_records %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Irrigation ID</th>
+                            <th>Farm ID</th>
+                            <th>Crop Name</th>
+                            <th>Date</th>
+                            <th>Water (Liters)</th>
+                            <th>Duration (Minutes)</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for record in irrigation_records %}
+                            <tr>
+                                <td>
+                                    {{ record.get('irrigation_id', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('farm_id', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('crop_name', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('irrigation_date', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('water_liters', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('duration_minutes', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('status', 'N/A') }}
+                                </td>
+
+                                <td>
+                                    {{ record.get('notes', '') }}
+                                </td>
+
+                                <td>
+                                    <a class="edit-btn"
+                                       href="{{ url_for('edit_irrigation_web', record_index=loop.index0) }}">
+                                        Edit
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('delete_irrigation_web', record_index=loop.index0) }}"
+                                          onsubmit="return confirm('Are you sure you want to delete this irrigation record?');">
+
+                                        <button type="submit"
+                                                class="delete-btn">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No saved irrigation records found.</p>
+        {% endif %}
+    </div>
+
+    <p class="muted">
+        Advice is preliminary and based on city weather data. It does not
+        replace crop-specific irrigation planning or direct root-zone
+        soil-moisture checks.
+    </p>
+
+</div>
+</body>
+</html>

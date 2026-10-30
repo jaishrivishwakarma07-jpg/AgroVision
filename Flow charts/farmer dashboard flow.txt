@@ -1,0 +1,20 @@
+Farmer Dashboard
+
+│
+├── My Profile
+│
+├── My Farm
+│
+├── My Crops
+│
+├── Soil Information
+│
+├── Weather
+│
+├── Fertilizer Recommendation
+│
+├── Disease Detection
+│
+├── Reports
+│
+└── Logout

@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation Record | AGROVISION</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f7f2;
+            color: #243426;
+            padding: 24px;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        h1 { color: #276738; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #ccd7cc;
+            border-radius: 6px;
+        }
+        button, .back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #276738;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .error { color: #a32222; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>
+        {% if record %}Edit Irrigation Record{% else %}Add Irrigation Record{% endif %}
+    </h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p class="error">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Farm ID *</label>
+        <input name="farm_id" required
+               value="{{ record.get('farm_id', '') if record else '' }}"
+               placeholder="Example: F001">
+
+        <label>Crop Name *</label>
+        <input name="crop_name" required
+               value="{{ record.get('crop_name', '') if record else '' }}"
+               placeholder="Example: Wheat">
+
+        <label>Irrigation Date *</label>
+        <input type="date" name="irrigation_date" required
+               value="{{ record.get('irrigation_date', '') if record else '' }}">
+
+        <label>Water Quantity (liters)</label>
+        <input type="number" name="water_liters" min="0" step="0.1" required
+               value="{{ record.get('water_liters', '') if record else '' }}">
+
+        <label>Duration (minutes)</label>
+        <input type="number" name="duration_minutes" min="0" step="1" required
+               value="{{ record.get('duration_minutes', '') if record else '' }}">
+
+        <label>Status</label>
+        <select name="status">
+            {% set current_status = record.get('status', 'Scheduled') if record else 'Scheduled' %}
+            {% for option in ['Scheduled', 'In Progress', 'Completed', 'Cancelled'] %}
+                <option value="{{ option }}"
+                    {% if current_status == option %}selected{% endif %}>
+                    {{ option }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Notes</label>
+        <textarea name="notes" rows="4">{{ record.get('notes', '') if record else '' }}</textarea>
+
+        <button type="submit">
+            {% if record %}Update Record{% else %}Save Record{% endif %}
+        </button>
+
+        <a class="back" href="{{ url_for('irrigation_management_web') }}">
+            Cancel
+        </a>
+    </form>
+</div>
+</body>
+</html>

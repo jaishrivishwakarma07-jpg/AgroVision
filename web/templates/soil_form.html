@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Record Form | AGROVISION</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f7f0;
+            color: #263528;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #276738;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #cbd5c5;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #a7d5ad;
+            border-color: #276738;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #276738;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .secondary {
+            background: #667366;
+        }
+
+        .message {
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+            background: #e8f5e9;
+            color: #24552b;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #667366;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<main class="container">
+    <section class="panel">
+
+        <h1>🌱 AGROVISION</h1>
+
+        <h2>
+            {{ 'Edit Soil Record' if soil else 'Add Soil Record' }}
+        </h2>
+
+        <p>Enter the available soil test details for the selected farm.</p>
+
+        {% for message in get_flashed_messages() %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+
+        <form method="POST">
+
+            <label for="farm_id">Farm *</label>
+            <select id="farm_id" name="farm_id" required>
+                <option value="">Select Farm</option>
+
+                {% for farm in farms %}
+                    <option
+                        value="{{ farm.get('farm_id', '') }}"
+                        {% if soil and soil.get('farm_id')|string == farm.get('farm_id')|string %}
+                            selected
+                        {% endif %}>
+                        {{ farm.get('farm_id', '') }} -
+                        {{ farm.get('farm_name', farm.get('name', farm.get('farm_id', 'Unknown Farm'))) }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="soil_type">Soil Type</label>
+            <select id="soil_type" name="soil_type">
+                {% for item in [
+                    'Loamy',
+                    'Black Soil',
+                    'Alluvial Soil',
+                    'Red Soil',
+                    'Sandy Soil',
+                    'Clay Soil',
+                    'Other'
+                ] %}
+                    <option
+                        value="{{ item }}"
+                        {% if soil and soil.get('soil_type') == item %}
+                            selected
+                        {% endif %}>
+                        {{ item }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="ph">pH</label>
+            <input
+                id="ph"
+                name="ph"
+                type="number"
+                min="0"
+                max="14"
+                step="0.1"
+                value="{{ soil.get('ph', soil.get('pH', '')) if soil else '' }}"
+                placeholder="e.g. 6.8">
+
+            <label for="nitrogen">Nitrogen</label>
+            <input
+                id="nitrogen"
+                name="nitrogen"
+                type="text"
+                value="{{ soil.get('nitrogen', '') if soil else '' }}"
+                placeholder="e.g. Medium or measured value">
+
+            <label for="phosphorus">Phosphorus</label>
+            <input
+                id="phosphorus"
+                name="phosphorus"
+                type="text"
+                value="{{ soil.get('phosphorus', '') if soil else '' }}"
+                placeholder="e.g. High or measured value">
+
+            <label for="potassium">Potassium</label>
+            <input
+                id="potassium"
+                name="potassium"
+                type="text"
+                value="{{ soil.get('potassium', '') if soil else '' }}"
+                placeholder="e.g. Medium or measured value">
+
+            <label for="moisture">Moisture (%)</label>
+            <input
+                id="moisture"
+                name="moisture"
+                type="number"
+                min="0"
+                max="100"
+                step="any"
+                value="{{ soil.get('moisture', '') if soil else '' }}"
+                placeholder="e.g. 45">
+
+            <label for="temperature">Soil Temperature (°C)</label>
+            <input
+                id="temperature"
+                name="temperature"
+                type="number"
+                step="any"
+                value="{{ soil.get('temperature', '') if soil else '' }}"
+                placeholder="e.g. 28">
+
+            <label for="organic_carbon">Organic Carbon</label>
+            <input
+                id="organic_carbon"
+                name="organic_carbon"
+                type="text"
+                value="{{ soil.get('organic_carbon', '') if soil else '' }}"
+                placeholder="e.g. 0.8">
+
+            <label for="report_date">Report Date</label>
+            <input
+                id="report_date"
+                name="report_date"
+                type="date"
+                value="{{ soil.get('report_date', soil.get('record_date', '')) if soil else '' }}">
+
+            <label for="notes">Additional Notes</label>
+            <textarea
+                id="notes"
+                name="notes"
+                rows="3"
+                placeholder="Optional soil observations">{{ soil.get('notes', '') if soil else '' }}</textarea>
+
+            <button class="btn" type="submit">Save Soil Record</button>
+
+            <a class="btn secondary"
+               href="{{ url_for('soil_management') }}">
+                Cancel
+            </a>
+
+        </form>
+    </section>
+</main>
+</body>
+</html>

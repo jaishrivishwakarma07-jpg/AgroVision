@@ -1,0 +1,122 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Farmer Dashboard</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7f3;
+            color: #24352a;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 20px 6%;
+            background: #174d31;
+            color: white;
+        }
+
+        header h1 { margin: 0; font-size: 24px; }
+
+        a { text-decoration: none; }
+
+        .logout {
+            color: white;
+            border: 1px solid #a9cbb4;
+            border-radius: 8px;
+            padding: 9px 14px;
+        }
+
+        main {
+            width: min(1000px, 92%);
+            margin: 35px auto;
+        }
+
+        .welcome, .tool {
+            background: white;
+            border: 1px solid #e4eae4;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .welcome { margin-bottom: 22px; }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .tool h2 { color: #237447; font-size: 18px; }
+
+        .button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #237447;
+            color: white;
+        }
+
+        .muted { color: #718075; line-height: 1.6; }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>AGROVISION</h1>
+        <a class="logout" href="{{ url_for('logout_page') }}">Logout</a>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h2>Welcome, {{ name }}!</h2>
+            <p class="muted">
+                Farmer Dashboard — access your agriculture tools from here.
+            </p>
+        </section>
+
+        <section class="tools">
+            <article class="tool">
+                <h2>AI Plant Scanner</h2>
+                <p class="muted">
+                    Upload a plant image to identify the plant and review available disease analysis.
+                </p>
+                <a class="button" href="{{ url_for('index') }}">Open Plant Scanner</a>
+            </article>
+
+            <article class="tool">
+                <h2>Weather & Environment</h2>
+                <p class="muted">
+                    View current weather and forecast using location coordinates.
+                </p>
+                <a class="button" href="{{ url_for('weather_api') }}?latitude=23.1765&longitude=75.7885">
+                    Test Weather API
+                </a>
+            </article>
+
+            <article class="tool">
+                <h2>Plant Suitability</h2>
+                <p class="muted">
+                    Check available plant information alongside environmental data.
+                </p>
+                <a class="button" href="{{ url_for('plant_suitability_api') }}?plant_name=wheat&latitude=23.1765&longitude=75.7885">
+                    Test Suitability API
+                </a>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
+```

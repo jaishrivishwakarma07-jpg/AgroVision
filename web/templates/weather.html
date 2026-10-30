@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Management | AGROVISION</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f3f7f0;
+            color: #263528;
+        }
+
+        .container { max-width: 1300px; margin: auto; }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        h1 { color: #276738; margin-top: 0; }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 6px;
+            background: #276738;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .delete { background: #b42318; }
+
+        input {
+            padding: 10px;
+            border: 1px solid #cbd5c5;
+            border-radius: 6px;
+            min-width: 220px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8df;
+        }
+
+        th { background: #eaf2e6; }
+        .table-wrap { overflow-x: auto; }
+        .count { color: #276738; }
+        form { margin: 0; }
+
+        .message {
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+            background: #e8f5e9;
+        }
+
+        .error {
+            background: #fdecec;
+            color: #9b1c1c;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .weather-card {
+            background: #f3f8ef;
+            border: 1px solid #dce9d5;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .weather-card .label {
+            color: #617263;
+            font-size: 14px;
+        }
+
+        .weather-card .value {
+            color: #276738;
+            font-size: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .weather-location { margin-bottom: 5px; }
+        .muted { color: #617263; font-size: 13px; }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <section class="panel">
+        <h1>AGROVISION</h1>
+        <h2>Weather Management</h2>
+        <p>Search live weather for a city and manage saved weather reports.</p>
+
+        <div class="actions">
+            <a class="btn" href="{{ url_for('dashboard_page') }}">
+                Admin Dashboard
+            </a>
+            <a class="btn" href="{{ url_for('add_weather_web') }}">
+                + Add Weather Report
+            </a>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </section>
+
+    <section class="panel">
+        <h2>Live Weather Search</h2>
+        <p>Enter a city name to retrieve its current weather from OpenWeather.</p>
+
+        <form method="GET"
+              action="{{ url_for('weather_management_web') }}"
+              class="actions">
+
+            <input
+                type="text"
+                name="city"
+                placeholder="Enter city, e.g. Satna"
+                value="{{ search_city }}"
+                required
+            >
+
+            <button class="btn" type="submit">Get Live Weather</button>
+
+            <a class="btn" href="{{ url_for('weather_management_web') }}">
+                Clear
+            </a>
+        </form>
+
+        {% if weather_error %}
+            <div class="error">
+                <strong>Weather unavailable:</strong>
+                {{ weather_error }}
+            </div>
+        {% endif %}
+
+        {% if live_weather %}
+            <h2 class="weather-location">
+                {{ live_weather.get('city', search_city) }}
+                {% if live_weather.get('country') %}
+                    , {{ live_weather.get('country') }}
+                {% endif %}
+            </h2>
+
+            <p>
+                Current conditions:
+                <strong>{{ live_weather.get('condition', 'Unknown') }}</strong>
+            </p>
+
+            <div class="weather-grid">
+
+                <div class="weather-card">
+                    <div class="label">Temperature</div>
+                    <div class="value">
+                        {% if live_weather.get('temperature') is not none %}
+                            {{ live_weather.get('temperature') }} °C
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    {% if live_weather.get('feels_like') is not none %}
+                        <p class="muted">
+                            Feels like {{ live_weather.get('feels_like') }} °C
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="weather-card">
+                    <div class="label">Humidity</div>
+                    <div class="value">
+                        {% if live_weather.get('humidity') is not none %}
+                            {{ live_weather.get('humidity') }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="label">Wind Speed</div>
+                    <div class="value">
+                        {% if live_weather.get('wind_speed') is not none %}
+                            {{ live_weather.get('wind_speed') }} m/s
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="label">Pressure</div>
+                    <div class="value">
+                        {% if live_weather.get('pressure') is not none %}
+                            {{ live_weather.get('pressure') }} hPa
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                
+<div class="weather-card">
+    <div class="label">Rain Chance</div>
+    <div class="value">
+        {% if live_weather.get('rain_chance') is not none %}
+            {{ live_weather.get('rain_chance') }}%
+        {% else %}
+            N/A
+        {% endif %}
+    </div>
+    <p class="muted">
+        {% if live_weather.get('forecast_period') %}
+            Forecast for {{ live_weather.get('forecast_period') }}
+        {% else %}
+            Forecast probability unavailable
+        {% endif %}
+    </p>
+</div>
+
+<div class="weather-card">
+    <div class="label">Forecast Rainfall</div>
+    <div class="value">
+        {% if live_weather.get('forecast_rainfall') is not none %}
+            {{ live_weather.get('forecast_rainfall') }} mm
+        {% else %}
+            N/A
+        {% endif %}
+    </div>
+    <p class="muted">Expected rainfall during the forecast period</p>
+</div>
+
+
+                <div class="weather-card">
+                    <div class="label">Cloud Cover</div>
+                    <div class="value">
+                        {% if live_weather.get('clouds') is not none %}
+                            {{ live_weather.get('clouds') }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="label">Visibility</div>
+                    <div class="value">
+                        {% if live_weather.get('visibility') is not none %}
+                            {{ (live_weather.get('visibility') / 1000) | round(1) }} km
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="muted">
+                Source: {{ live_weather.get('source', 'OpenWeather') }}.
+                Current weather and rain probability are provided by OpenWeather.
+                Rain probability refers to the next 3-hour forecast period.
+            </p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Saved Weather Reports</h2>
+
+        {% if search_city %}
+            <p>Showing saved reports matching: <strong>{{ search_city }}</strong></p>
+        {% endif %}
+
+        <h3 class="count">
+            Weather Reports: {{ weather_records|length }}
+        </h3>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>Temperature</th>
+                        <th>Humidity</th>
+                        <th>Rain Chance</th>
+                        <th>Wind Speed</th>
+                        <th>Condition</th>
+                        <th>Report Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in weather_records %}
+                    {% set record_index = loop.index0 %}
+
+                    <tr>
+                        <td>{{ item.get('city', '') }}</td>
+                        <td>{{ item.get('temperature', '') }}</td>
+                        <td>{{ item.get('humidity', '') }}</td>
+                        <td>{{ item.get('rain', '') }}</td>
+                        <td>{{ item.get('wind', '') }}</td>
+                        <td>{{ item.get('condition', '') }}</td>
+                        <td>{{ item.get('report_date', '') }}</td>
+                        <td>
+                            <div class="actions">
+                                <a class="btn"
+                                   href="{{ url_for('edit_weather_web', record_index=record_index) }}">
+                                    Edit
+                                </a>
+
+                                <form method="POST"
+                                      action="{{ url_for('delete_weather_web', record_index=record_index) }}"
+                                      onsubmit="return confirm('Delete this weather report?');">
+
+                                    <button class="btn delete" type="submit">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="8">No matching saved weather reports found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

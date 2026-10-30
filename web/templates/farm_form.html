@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Form | AGROVISION</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f7f0; padding: 24px; color: #243426; }
+        .container { max-width: 650px; margin: auto; }
+        .panel { background: white; padding: 24px; border-radius: 12px; }
+        h1 { color: #276738; }
+        label { display: block; margin-top: 14px; font-weight: bold; }
+        input, select { box-sizing: border-box; width: 100%; padding: 11px; margin-top: 6px; border: 1px solid #cbd5c5; border-radius: 6px; }
+        .btn { display: inline-block; margin-top: 18px; padding: 11px 16px; border: 0; border-radius: 6px; background: #276738; color: white; text-decoration: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <section class="panel">
+        <h1>🌱 AGROVISION</h1>
+        <h2>{{ 'Edit Farm' if farm else 'Add Farm' }}</h2>
+
+        <form method="POST">
+            <label>Farmer *</label>
+            <select name="farmer_id" required>
+                <option value="">Select Farmer</option>
+                {% for f in farmers %}
+                    <option value="{{ f.get('farmer_id', '') }}"
+                        {% if farm and farm.get('farmer_id') == f.get('farmer_id') %}selected{% endif %}>
+                        {{ f.get('farmer_id', '') }} - {{ f.get('name', '') }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Farm Name *</label>
+            <input name="farm_name" required value="{{ farm.get('farm_name', '') if farm else '' }}">
+
+            <label>Land Area</label>
+            <input name="land_area" type="number" min="0" step="any" value="{{ farm.get('land_area', '') if farm else '' }}">
+
+            <label>Soil Type</label>
+            <select name="soil_type">
+                {% for soil in ['', 'Black Soil', 'Alluvial Soil', 'Red Soil', 'Sandy Soil', 'Clay Soil', 'Loamy Soil', 'Other'] %}
+                    <option value="{{ soil }}" {% if farm and farm.get('soil_type') == soil %}selected{% endif %}>{{ soil if soil else 'Select Soil Type' }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Irrigation Type</label>
+            <select name="irrigation_type">
+                {% for irrigation in ['', 'Drip', 'Sprinkler', 'Canal', 'Rainfed', 'Other'] %}
+                    <option value="{{ irrigation }}" {% if farm and farm.get('irrigation_type') == irrigation %}selected{% endif %}>{{ irrigation if irrigation else 'Select Irrigation Type' }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Village</label>
+            <input name="village" value="{{ farm.get('village', '') if farm else '' }}">
+
+            <label>District</label>
+            <input name="district" value="{{ farm.get('district', '') if farm else '' }}">
+
+            <button class="btn" type="submit">Save Farm</button>
+            <a class="btn" href="{{ url_for('farm_management') }}">Cancel</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,153 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #e9f5ed, #d4e9d9);
+            color: #24352a;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 35px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(23, 77, 49, 0.12);
+        }
+
+        .brand {
+            text-align: center;
+            color: #237447;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin: 8px 0 28px;
+            color: #718075;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d9e3da;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #237447;
+            box-shadow: 0 0 0 3px rgba(35, 116, 71, 0.1);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #237447;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #174d31;
+        }
+
+        .message {
+            padding: 11px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #fff0ed;
+            color: #a83224;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            color: #718075;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-card">
+        <div class="brand">AGROVISION</div>
+
+        <p class="subtitle">
+            AI-Powered Smart Agriculture Management System
+            <br>
+            Sign in to continue
+        </p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login_page') }}">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                autocomplete="username"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="footer">
+            AGROVISION &copy; Smart Agriculture
+        </div>
+    </main>
+</body>
+</html>
+```

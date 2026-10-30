@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Management | AGROVISION</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f7f0; padding: 24px; color: #243426; }
+        .container { max-width: 1100px; margin: auto; }
+        .panel { background: white; padding: 22px; border-radius: 12px; margin-bottom: 20px; }
+        h1 { color: #276738; }
+        .btn { display: inline-block; padding: 9px 14px; border: 0; border-radius: 6px; background: #276738; color: white; text-decoration: none; cursor: pointer; }
+        .delete { background: #b42318; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border-bottom: 1px solid #e1e8dd; text-align: left; }
+        th { background: #eaf2e6; }
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .message { padding: 10px; background: #eaf2e6; margin: 8px 0; border-radius: 6px; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <section class="panel">
+        <h1>🌱 AGROVISION</h1>
+        <h2>Farmer Management</h2>
+        <p>Add, view, update and delete farmer records.</p>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('dashboard_page') }}">← Dashboard</a>
+            <a class="btn" href="{{ url_for('add_farmer') }}">+ Add Farmer</a>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </section>
+
+    <section class="panel">
+        <h2>Total Farmers: {{ farmers|length }}</h2>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmer ID</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Village</th>
+                    <th>District</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for farmer in farmers %}
+                <tr>
+                    <td>{{ farmer.get('farmer_id', '') }}</td>
+                    <td>{{ farmer.get('name', '') }}</td>
+                    <td>{{ farmer.get('mobile', '') }}</td>
+                    <td>{{ farmer.get('village', '') }}</td>
+                    <td>{{ farmer.get('district', '') }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn" href="{{ url_for('edit_farmer', farmer_id=farmer.get('farmer_id', '')) }}">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_farmer', farmer_id=farmer.get('farmer_id', '')) }}" onsubmit="return confirm('Delete this farmer record?');">
+                                <button class="btn delete" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">No farmer records found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
+

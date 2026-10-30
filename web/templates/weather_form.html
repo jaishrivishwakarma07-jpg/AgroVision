@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Form | AGROVISION</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 24px; font-family: Arial, sans-serif; background: #f3f7f0; color: #263528; }
+        .container { max-width: 720px; margin: auto; }
+        .panel { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 3px 12px #0000000d; }
+        h1 { color: #276738; margin-top: 0; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select { width: 100%; padding: 11px; margin-top: 6px; border: 1px solid #cbd5c5; border-radius: 6px; }
+        .btn { display: inline-block; margin-top: 20px; padding: 11px 16px; border: 0; border-radius: 6px; background: #276738; color: white; text-decoration: none; cursor: pointer; }
+        .secondary { background: #667366; }
+        .message { padding: 12px; margin-top: 12px; border-radius: 6px; background: #e8f5e9; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <section class="panel">
+        <h1>🌦️ AGROVISION</h1>
+        <h2>{{ 'Edit Weather Report' if weather else 'Add Weather Report' }}</h2>
+        <p>Enter a weather report. These values are manually entered, not live API readings.</p>
+
+        {% for message in get_flashed_messages() %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+
+        <form method="POST">
+            <label for="city">City *</label>
+            <input id="city" name="city" required value="{{ weather.get('city', '') if weather else '' }}" placeholder="e.g. Bhopal">
+
+            <label for="temperature">Temperature (°C) *</label>
+            <input id="temperature" name="temperature" type="number" step="any" required value="{{ (weather.get('temperature', '')|string).replace('°C', '') if weather else '' }}">
+
+            <label for="humidity">Humidity (%) *</label>
+            <input id="humidity" name="humidity" type="number" min="0" max="100" step="any" required value="{{ (weather.get('humidity', '')|string).replace('%', '') if weather else '' }}">
+
+            <label for="rain">Rain Chance (%) *</label>
+            <input id="rain" name="rain" type="number" min="0" max="100" step="any" required value="{{ (weather.get('rain', '')|string).replace('%', '') if weather else '' }}">
+
+            <label for="wind">Wind Speed (km/h) *</label>
+            <input id="wind" name="wind" type="number" min="0" step="any" required value="{{ (weather.get('wind', '')|string).replace('km/h', '')|trim if weather else '' }}">
+
+            <label for="condition">Weather Condition *</label>
+            <select id="condition" name="condition" required>
+                {% for condition in ['Sunny', 'Cloudy', 'Partly Cloudy', 'Rainy', 'Stormy', 'Windy', 'Foggy', 'Other'] %}
+                    <option value="{{ condition }}" {% if weather and weather.get('condition', '')|lower == condition|lower %}selected{% endif %}>{{ condition }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="report_date">Report Date</label>
+            <input id="report_date" name="report_date" type="date" value="{{ weather.get('report_date', '') if weather else '' }}">
+
+            <button class="btn" type="submit">Save Weather Report</button>
+            <a class="btn secondary" href="{{ url_for('weather_management_web') }}">Cancel</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>

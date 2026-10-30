@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Reports Center</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f6f1;
+            color: #243528;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .header {
+            background: #245b38;
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .header h1 { margin: 0 0 10px; }
+        .header p { color: #e1eee3; }
+
+        .panel {
+            background: white;
+            padding: 23px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px #0000000c;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 7px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd8cc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button, .button {
+            display: inline-block;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #287447;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        button:hover, .button:hover { background: #194e30; }
+
+        .secondary { background: #596b5e; }
+
+        .message {
+            background: #e7f5e9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .category {
+            background: #f8fbf7;
+            border: 1px solid #dce7dc;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .category h3 {
+            margin-top: 0;
+            color: #245b38;
+            font-size: 16px;
+        }
+
+        .category p {
+            color: #607064;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e1e8e1;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th { background: #edf4ed; }
+
+        .muted {
+            color: #647468;
+            font-size: 13px;
+        }
+
+        .actions { white-space: nowrap; }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .panel { padding: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header class="header">
+        <h1>AGROVISION Reports Center</h1>
+        <p>Manage and maintain your agriculture reports.</p>
+        <a class="button secondary"
+           href="{{ url_for('dashboard_page') }}">
+            Back to Dashboard
+        </a>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="panel">
+        <h2>Report Categories</h2>
+
+        <div class="categories">
+            <div class="category">
+                <h3>Farmer &amp; Farm Reports</h3>
+                <p>Farmer details and farm records.</p>
+            </div>
+
+            <div class="category">
+                <h3>Crop &amp; Soil Reports</h3>
+                <p>Crop information and soil records.</p>
+            </div>
+
+            <div class="category">
+                <h3>Weather &amp; Irrigation Reports</h3>
+                <p>Weather observations and irrigation records.</p>
+            </div>
+
+            <div class="category">
+                <h3>Fertilizer Recommendation Reports</h3>
+                <p>Fertilizer recommendations and schedules.</p>
+            </div>
+
+            <div class="category">
+                <h3>Disease Detection Reports</h3>
+                <p>Plant disease findings and treatments.</p>
+            </div>
+
+            <div class="category">
+                <h3>Market Price Reports</h3>
+                <p>Crop market prices and related records.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel" id="report-form">
+        {% if edit_report %}
+            <h2>Edit Report</h2>
+            <p class="muted">
+                Editing report ID: {{ edit_report.report_id }}
+            </p>
+        {% else %}
+            <h2>Add Report</h2>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('reports_center') }}">
+
+            {% if edit_report %}
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="report_id"
+                       value="{{ edit_report.report_id }}">
+            {% else %}
+                <input type="hidden" name="action" value="add">
+            {% endif %}
+
+            <label for="title">Report Title</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                maxlength="150"
+                value="{{ edit_report.title if edit_report else '' }}"
+                placeholder="Enter report title"
+                required
+            >
+
+            <label for="category">Report Category</label>
+            <select id="category" name="category" required>
+                <option value="">Select category</option>
+
+                {% for category in categories %}
+                    <option
+                        value="{{ category }}"
+                        {% if edit_report and edit_report.category == category %}
+                            selected
+                        {% elif not edit_report and selected_category == category %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="description">Description</label>
+            <textarea
+                id="description"
+                name="description"
+                placeholder="Enter report description"
+                required
+            >{{ edit_report.description if edit_report else '' }}</textarea>
+
+            <label for="notes">Additional Notes (Optional)</label>
+            <textarea
+                id="notes"
+                name="notes"
+                placeholder="Enter additional notes"
+            >{{ edit_report.notes if edit_report else '' }}</textarea>
+
+            {% if edit_report %}
+                <button type="submit">Update Report</button>
+                <a class="button secondary"
+                   href="{{ url_for('reports_center') }}">
+                    Cancel Edit
+                </a>
+            {% else %}
+                <button type="submit">Add Report</button>
+            {% endif %}
+        </form>
+    </section>
+
+    <section class="panel" id="saved-reports">
+        <h2>See Reports</h2>
+
+        <form method="GET" action="{{ url_for('reports_center') }}">
+            <label for="filter-category">Filter by Category</label>
+
+            <select id="filter-category" name="category">
+                <option value="">All Categories</option>
+
+                {% for category in categories %}
+                    <option
+                        value="{{ category }}"
+                        {% if selected_category == category %}selected{% endif %}
+                    >
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Show Reports</button>
+
+            <a class="button secondary"
+               href="{{ url_for('reports_center') }}">
+                Show All
+            </a>
+        </form>
+
+        <p class="muted">
+            Reports displayed: {{ reports|length }}
+        </p>
+
+        {% if reports %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Title and Description</th>
+                        <th>Category</th>
+                        <th>Dates</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for report in reports %}
+                        <tr>
+                            <td>{{ report.report_id }}</td>
+
+                            <td>
+                                <strong>{{ report.title }}</strong>
+                                <p>{{ report.description }}</p>
+
+                                {% if report.notes %}
+                                    <p class="muted">
+                                        Notes: {{ report.notes }}
+                                    </p>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ report.category }}</td>
+
+                            <td class="muted">
+                                Created: {{ report.created_at }}<br>
+                                Updated: {{ report.updated_at }}
+                            </td>
+
+                            <td class="actions">
+                                <a class="button"
+                                   href="{{ url_for('reports_center', edit=report.report_id) }}">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No reports found. Add your first report using the form above.</p>
+        {% endif %}
+    </section>
+
+</div>
+</body>
+</html>

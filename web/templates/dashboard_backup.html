@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Dashboard</title>
+
+    <style>
+        :root {
+            --green: #237447;
+            --green-dark: #174d31;
+            --green-light: #e9f5ed;
+            --background: #f4f7f3;
+            --text: #24352a;
+            --muted: #718075;
+            --border: #e4eae4;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 245px;
+            background: var(--green-dark);
+            color: white;
+            padding: 26px 16px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0 12px;
+        }
+
+        .brand small {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: #c8e5d0;
+            margin-top: 7px;
+            letter-spacing: 0;
+        }
+
+        .nav-title {
+            margin: 35px 12px 12px;
+            font-size: 11px;
+            color: #a9cbb4;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #e2efe5;
+            padding: 12px;
+            border-radius: 9px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            background: #327e50;
+            color: white;
+        }
+
+        .sidebar-note {
+            margin: 35px 10px 0;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #c4dfcc;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-size: 27px;
+            margin: 0 0 7px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 9px;
+            background: var(--green);
+            color: white;
+            text-decoration: none;
+            border: 0;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .button.secondary {
+            background: white;
+            color: var(--green-dark);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 17px;
+            margin: 25px 0 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 19px;
+            min-width: 0;
+            box-shadow: 0 3px 12px rgba(30, 70, 40, 0.025);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 750;
+            margin: 12px 0 7px;
+            color: var(--green-dark);
+        }
+
+        .stat-note {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 105px minmax(40px, 1fr) 30px;
+            gap: 10px;
+            align-items: center;
+            margin: 17px 0;
+            font-size: 13px;
+        }
+
+        .bar-track {
+            background: #edf2ed;
+            height: 11px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .bar {
+            background: #3e9360;
+            height: 100%;
+            border-radius: 20px;
+            min-width: 0;
+        }
+
+        .empty {
+            color: var(--muted);
+            font-size: 13px;
+            padding: 12px 0;
+        }
+
+        .soil-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .soil-item {
+            background: #f5f9f5;
+            border-radius: 10px;
+            padding: 13px;
+        }
+
+        .soil-item span {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .soil-item strong {
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .weather-item {
+            background: var(--green-light);
+            border-radius: 11px;
+            padding: 14px;
+        }
+
+        .weather-item span {
+            display: block;
+            font-size: 12px;
+            color: #52725b;
+            margin-bottom: 8px;
+        }
+
+        .weather-item strong {
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 13px 10px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: var(--green-light);
+            color: var(--green-dark);
+            font-size: 11px;
+        }
+
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 18px;
+            }
+
+            .nav-title,
+            .sidebar-note {
+                display: none;
+            }
+
+            .sidebar nav {
+                display: flex;
+                gap: 5px;
+                overflow-x: auto;
+                margin-top: 15px;
+            }
+
+            .nav-link {
+                white-space: nowrap;
+                padding: 10px;
+            }
+
+            .main {
+                padding: 18px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .card {
+                padding: 14px;
+            }
+
+            .stat-number {
+                font-size: 25px;
+            }
+
+            .soil-grid,
+            .weather-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">
+            🌱 AGROVISION
+            <small>Smart Agriculture Management</small>
+        </div>
+
+        <div class="nav-title">Workspace</div>
+
+        <nav>
+            <a class="nav-link active" href="/dashboard">▦ Dashboard</a>
+            <a class="nav-link" href="/">🌿 AI Plant Scanner</a>
+            <a class="nav-link" href="#crops">🌾 Crop Analytics</a>
+            <a class="nav-link" href="#soil">🧪 Soil Reports</a>
+            <a class="nav-link" href="#weather">☁ Weather</a>
+            <a class="nav-link" href="#diseases">🔬 Disease Records</a>
+        </nav>
+
+        <div class="sidebar-note">
+            Agriculture insights in one place.<br>
+            Data shown from your local project database.
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>Dashboard Overview</h1>
+                <div class="subtitle">
+                    Monitor your farms, crops and agriculture records.
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <a class="button secondary" href="/dashboard">↻ Refresh</a>
+                <a class="button" href="/">Open Plant Scanner ↗</a>
+            </div>
+        </header>
+
+        <h2 class="section-title">Farm Overview</h2>
+
+        <section class="stats">
+            <div class="card">
+                <div class="stat-label">Total Farmers</div>
+                <div class="stat-number">{{ stats.farmers }}</div>
+                <div class="stat-note">Registered farmer records</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Total Farms</div>
+                <div class="stat-number">{{ stats.farms }}</div>
+                <div class="stat-note">Registered farm records</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Total Crops</div>
+                <div class="stat-number">{{ stats.crops }}</div>
+                <div class="stat-note">Crop records available</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Disease Records</div>
+                <div class="stat-number">{{ stats.diseases }}</div>
+                <div class="stat-note">Saved detection records</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Soil Reports</div>
+                <div class="stat-number">{{ stats.soil }}</div>
+                <div class="stat-note">Soil records available</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Irrigation Records</div>
+                <div class="stat-number">{{ stats.irrigation }}</div>
+                <div class="stat-note">Water management records</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Weather Records</div>
+                <div class="stat-number">{{ stats.weather }}</div>
+                <div class="stat-note">Saved weather observations</div>
+            </div>
+
+            <div class="card">
+                <div class="stat-label">Fertilizer Records</div>
+                <div class="stat-number">{{ stats.fertilizer }}</div>
+                <div class="stat-note">Saved fertilizer records</div>
+            </div>
+        </section>
+
+        <h2 class="section-title" id="crops">Crop Analytics</h2>
+
+        <section class="content-grid">
+            <div class="card">
+                <h3>Crop Status</h3>
+
+                {% if crop_status %}
+                    {% for name, count in crop_status.items() %}
+                    <div class="chart-row">
+                        <span>{{ name }}</span>
+                        <div class="bar-track">
+                            <div class="bar"
+                                 style="width: {{ (count * 100 / stats.crops) | round(1) }}%">
+                            </div>
+                        </div>
+                        <strong>{{ count }}</strong>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty">No crop records available.</div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <h3>Crop Seasons</h3>
+
+                {% if crop_seasons %}
+                    {% for name, count in crop_seasons.items() %}
+                    <div class="chart-row">
+                        <span>{{ name }}</span>
+                        <div class="bar-track">
+                            <div class="bar"
+                                 style="width: {{ (count * 100 / stats.crops) | round(1) }}%">
+                            </div>
+                        </div>
+                        <strong>{{ count }}</strong>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty">No crop season data available.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <h2 class="section-title">Farm Locations</h2>
+
+        <section class="card">
+            {% if districts %}
+                {% for name, count in districts.items() %}
+                <div class="chart-row">
+                    <span>{{ name }}</span>
+                    <div class="bar-track">
+                        <div class="bar"
+                             style="width: {{ (count * 100 / stats.farms) | round(1) }}%">
+                        </div>
+                    </div>
+                    <strong>{{ count }}</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty">No farm location records available.</div>
+            {% endif %}
+        </section>
+
+        <h2 class="section-title" id="soil">Latest Soil Report</h2>
+
+        <section class="card">
+            {% if latest_soil %}
+                <div class="soil-grid">
+                    <div class="soil-item">
+                        <span>Soil Type</span>
+                        <strong>{{ latest_soil.soil_type }}</strong>
+                    </div>
+                    <div class="soil-item">
+                        <span>pH</span>
+                        <strong>{{ latest_soil.ph }}</strong>
+                    </div>
+                    <div class="soil-item">
+                        <span>Nitrogen</span>
+                        <strong>{{ latest_soil.nitrogen }}</strong>
+                    </div>
+                    <div class="soil-item">
+                        <span>Phosphorus</span>
+                        <strong>{{ latest_soil.phosphorus }}</strong>
+                    </div>
+                    <div class="soil-item">
+                        <span>Potassium</span>
+                        <strong>{{ latest_soil.potassium }}</strong>
+                    </div>
+                    <div class="soil-item">
+                        <span>Moisture</span>
+                        <strong>{{ latest_soil.moisture }}%</strong>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty">No soil reports available.</div>
+            {% endif %}
+        </section>
+
+        <h2 class="section-title" id="weather">Saved Weather Information</h2>
+
+        <section class="card">
+            {% if latest_weather %}
+                <h3>{{ latest_weather.city }}</h3>
+
+                <div class="weather-grid">
+                    <div class="weather-item">
+                        <span>Temperature</span>
+                        <strong>{{ latest_weather.temperature }}</strong>
+                    </div>
+                    <div class="weather-item">
+                        <span>Humidity</span>
+                        <strong>{{ latest_weather.humidity }}</strong>
+                    </div>
+                    <div class="weather-item">
+                        <span>Rain</span>
+                        <strong>{{ latest_weather.rain }}</strong>
+                    </div>
+                    <div class="weather-item">
+                        <span>Wind</span>
+                        <strong>{{ latest_weather.wind }}</strong>
+                    </div>
+                    <div class="weather-item">
+                        <span>Condition</span>
+                        <strong>{{ latest_weather.condition }}</strong>
+                    </div>
+                </div>
+
+                <p class="subtitle">
+                    This section displays the latest saved weather record.
+                    Refresh the weather module to update it.
+                </p>
+            {% else %}
+                <div class="empty">No saved weather information available.</div>
+            {% endif %}
+        </section>
+
+        <h2 class="section-title" id="diseases">Recent Disease Records</h2>
+
+        <section class="card table-wrap">
+            {% if recent_diseases %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Disease</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_diseases %}
+                    <tr>
+                        <td>{{ item.disease }}</td>
+                        <td>
+                            {% if item.confidence != "Unknown" %}
+                                {{ item.confidence }}%
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                        <td>{{ item.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="empty">No disease records available.</div>
+            {% endif %}
+        </section>
+
+        <div class="footer">
+            AGROVISION · AI-Powered Smart Agriculture Management System
+        </div>
+    </main>
+</div>
+</body>
+</html>

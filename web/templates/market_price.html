@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGROVISION | Market Price</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f7f2;
+            color: #24352a;
+        }
+        .container { max-width: 1200px; margin: auto; }
+        .header {
+            background: #176b3a;
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+        .header h1 { margin: 0 0 8px; }
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5cc;
+            border-radius: 7px;
+            font-size: 15px;
+            background: white;
+        }
+        button, .link {
+            display: inline-block;
+            border: 0;
+            border-radius: 7px;
+            background: #176b3a;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 16px;
+        }
+        .secondary { background: #52645a; }
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8e3;
+        }
+        th { background: #e5f1e7; }
+        .message {
+            padding: 13px;
+            background: #fff5d8;
+            border-radius: 7px;
+            margin-top: 15px;
+        }
+        .count { color: #176b3a; font-weight: bold; }
+        .suggestions a {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background: #e5f1e7;
+            color: #176b3a;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .top-links { margin-bottom: 20px; }
+        .top-links a { margin-right: 10px; }
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>🌾 AGROVISION</h1>
+        <p>Market Price & Mandi Search</p>
+        <p>Find crop prices from the available mandi dataset.</p>
+    </div>
+
+    <div class="top-links">
+        <a class="link" href="{{ url_for('dashboard_page') }}">← Dashboard</a>
+        <a class="link secondary"
+           href="{{ url_for('admin_module_page', module_name='market') }}">
+           Market Records
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>Search Crop Prices</h2>
+
+        {% if not csv_found %}
+            <div class="message">
+                CSV file not found. Expected file:
+                <strong>database/mandi_prices.csv</strong>
+            </div>
+        {% endif %}
+
+        <form method="GET" action="{{ url_for('market_price_search') }}">
+            <div class="form-grid">
+                <div>
+                    <label for="crop">Crop / Commodity Name *</label>
+                    <input
+                        id="crop"
+                        name="crop"
+                        list="crop-options"
+                        value="{{ crop }}"
+                        placeholder="e.g. Rice, Wheat, Tomato"
+                        required
+                    >
+                    <datalist id="crop-options">
+                        {% for name in crop_names %}
+                            <option value="{{ name }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div>
+                    <label for="state">State (optional)</label>
+                    <input
+                        id="state"
+                        name="state"
+                        list="state-options"
+                        value="{{ state }}"
+                        placeholder="e.g. Uttar Pradesh"
+                    >
+                    <datalist id="state-options">
+                        {% for name in state_names %}
+                            <option value="{{ name }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div>
+                    <label for="district">District (optional)</label>
+                    <input
+                        id="district"
+                        name="district"
+                        value="{{ district }}"
+                        placeholder="e.g. Lucknow"
+                    >
+                </div>
+            </div>
+
+            <button type="submit">Search Mandi Prices</button>
+            <a class="link secondary"
+               href="{{ url_for('market_price_search') }}">Clear</a>
+        </form>
+    </div>
+
+    {% if crop %}
+        <div class="card">
+            <h2>Search Results</h2>
+
+            <p>
+                Crop: <strong>{{ crop }}</strong>
+                {% if state %} | State: <strong>{{ state }}</strong>{% endif %}
+                {% if district %} | District: <strong>{{ district }}</strong>{% endif %}
+            </p>
+
+            {% if results %}
+                <p class="count">
+                    Showing {{ results|length }} of {{ total_results }} matching records
+                    {% if total_results > 200 %}
+                        (maximum 200 displayed)
+                    {% endif %}
+                </p>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>State</th>
+                                <th>District</th>
+                                <th>Mandi / Market</th>
+                                <th>Arrival Date</th>
+                                <th>Minimum Price</th>
+                                <th>Maximum Price</th>
+                                <th>Modal Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in results %}
+                            <tr>
+                                <td>{{ row.get('Commodity', '-') }}</td>
+                                <td>{{ row.get('State', '-') }}</td>
+                                <td>{{ row.get('District', '-') }}</td>
+                                <td>{{ row.get('Market', '-') }}</td>
+                                <td>{{ row.get('Arrival_Date', '-') }}</td>
+                                <td>₹ {{ row.get('Min_x0020_Price', '-') }}</td>
+                                <td>₹ {{ row.get('Max_x0020_Price', '-') }}</td>
+                                <td><strong>₹ {{ row.get('Modal_x0020_Price', '-') }}</strong></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="message">
+                    Prices are displayed as recorded in the CSV dataset.
+                    Confirm the latest rate with the relevant mandi before trading.
+                </p>
+
+            {% else %}
+                <div class="message">
+                    No records matched all your search filters.
+                    Check the crop spelling or remove the state/district filter.
+                </div>
+
+                {% if suggestions %}
+                    <h3>Similar crop names</h3>
+                    <div class="suggestions">
+                        {% for suggestion in suggestions %}
+                            <a href="{{ url_for(
+                                'market_price_search',
+                                crop=suggestion,
+                                state=state,
+                                district=district
+                            ) }}">{{ suggestion }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="card">
+        <p>
+            <strong>Note:</strong> The search uses the available CSV dataset.
+            It does not guarantee that prices are live or updated in real time.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

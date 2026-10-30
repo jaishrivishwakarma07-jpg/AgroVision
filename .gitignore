@@ -1,0 +1,43 @@
+﻿# API keys and environment secrets
+.env
+.env.*
+!.env.example
+API keys.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Editor settings
+.vscode/
+
+# Logs and temporary files
+*.log
+.DS_Store
+Thumbs.db
+
+# Private user and farmer data
+database/farmers.json
+database/users.json
+
+# Local API key notes
+API keys.txt
+
+# Private reports and generated data
+reports/
+database/farmers.json
+database/users.json
+
+# Uploaded images are generated at runtime
+web/uploads/
+
+
+database/farms.json
+
+database/*.json
