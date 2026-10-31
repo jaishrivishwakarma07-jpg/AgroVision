@@ -2553,7 +2553,7 @@ def plant_suitability_api():
 # ============================================================
 
 def get_users():
-    """Load registered users and Render admin credentials."""
+    """Load registered users and sync Render admin credentials."""
 
     users = load_json("users.json", [])
 
@@ -2565,17 +2565,20 @@ def get_users():
         if isinstance(user, dict)
     ]
 
-    # Add admin account from Render environment variables
     admin_username = os.environ.get("ADMIN_USERNAME")
     admin_password = os.environ.get("ADMIN_PASSWORD")
 
     if admin_username and admin_password:
+        admin_exists = False
 
-        admin_exists = any(
-            user.get("username") == admin_username
-            and str(user.get("role", "")).lower() == "admin"
-            for user in users
-        )
+        for user in users:
+            if (
+                user.get("username") == admin_username
+                and str(user.get("role", "")).lower() == "admin"
+            ):
+                user["password"] = admin_password
+                admin_exists = True
+                break
 
         if not admin_exists:
             users.append({
@@ -2587,7 +2590,6 @@ def get_users():
             })
 
     return users
-
 
 def current_user():
     """Return the logged-in user's session data."""
