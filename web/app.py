@@ -5,6 +5,7 @@ import base64
 from datetime import datetime
 from pathlib import Path
 
+from numpy import rint
 import requests
 
 from flask import (
@@ -2567,10 +2568,11 @@ def get_users():
 
     admin_username = os.environ.get("ADMIN_USERNAME")
     admin_password = os.environ.get("ADMIN_PASSWORD")
+    print("ADMIN CONFIG CHECK:", bool(admin_username), bool(admin_password))
+    print("ADMIN USERNAME MATCH:", admin_username == "admin")
 
     if admin_username and admin_password:
         admin_exists = False
-
         for user in users:
             if (
                 user.get("username") == admin_username
