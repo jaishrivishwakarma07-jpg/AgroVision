@@ -19,7 +19,6 @@ from flask import (
     flash,
 )
 
-from streamlit import image
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
