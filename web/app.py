@@ -19,6 +19,7 @@ from flask import (
     flash,
 )
 
+from streamlit import image
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
@@ -1036,7 +1037,7 @@ def compare_species_results(
 
         selected = plantnet_result
         other = plantid_result
-
+        
     else:
 
         selected = plantid_result
@@ -2553,17 +2554,40 @@ def plant_suitability_api():
 # ============================================================
 
 def get_users():
-    """Load registered users from users.json."""
+    """Load registered users and Render admin credentials."""
 
     users = load_json("users.json", [])
 
     if not isinstance(users, list):
-        return []
+        users = []
 
-    return [
+    users = [
         user for user in users
         if isinstance(user, dict)
     ]
+
+    # Add admin account from Render environment variables
+    admin_username = os.environ.get("ADMIN_USERNAME")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+
+    if admin_username and admin_password:
+
+        admin_exists = any(
+            user.get("username") == admin_username
+            and str(user.get("role", "")).lower() == "admin"
+            for user in users
+        )
+
+        if not admin_exists:
+            users.append({
+                "id": "render-admin",
+                "name": "Administrator",
+                "username": admin_username,
+                "password": admin_password,
+                "role": "admin"
+            })
+
+    return users
 
 
 def current_user():
@@ -4425,58 +4449,45 @@ def delete_weather_web(record_index):
 
     return redirect(url_for("weather_management_web"))
 
-
 # ============================================================
 # MAIN PLANT IDENTIFICATION ROUTE
 # ============================================================
+@app.route("/")
+def home():
+    if current_user():
+        return redirect(url_for("role_home"))
 
-@app.route(
-    "/",
-    methods=["GET", "POST"]
-)
+    return redirect(url_for("login_page"))
+
+
+@app.route("/plant-scanner", methods=["GET", "POST"])
 def index():
 
     if request.method == "GET":
-
-        return render_template(
-            "disease.html"
-        )
+        return render_template("disease.html")
 
     # --------------------------------------------------------
     # CHECK IMAGE
     # --------------------------------------------------------
 
     if "image" not in request.files:
-
         return render_template(
             "disease.html",
-            error=(
-                "Please select or capture "
-                "a plant image."
-            )
+            error="Please select or capture a plant image."
         )
 
     image = request.files["image"]
 
     if not image or not image.filename:
-
         return render_template(
             "disease.html",
-            error=(
-                "No image was selected."
-            )
+            error="No image was selected."
         )
 
-    if not allowed_file(
-        image.filename
-    ):
-
+    if not allowed_file(image.filename):
         return render_template(
             "disease.html",
-            error=(
-                "Only JPG, JPEG, PNG or WEBP "
-                "images are allowed."
-            )
+            error="Only JPG, JPEG, PNG or WEBP images are allowed."
         )
 
     # --------------------------------------------------------

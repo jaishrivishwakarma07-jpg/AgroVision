@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1037,7 +1037,7 @@
 
         <form
             id="diseaseForm"
-            action="/"
+            action="/plant-scanner"
             method="POST"
             enctype="multipart/form-data"
         >
@@ -1098,7 +1098,7 @@
                         class="btn btn-danger"
                         onclick="closeCamera()"
                     >
-                        ✕ Close Camera
+                        âœ• Close Camera
                     </button>
 
                 </div>
@@ -1138,7 +1138,7 @@
                         width:100%;
                     "
                 >
-                    ✕ Remove Image
+                    âœ• Remove Image
                 </button>
 
             </div>
@@ -1196,7 +1196,7 @@
         <div class="error-message">
 
             <strong>
-                ⚠️ Analysis Error
+                âš ï¸ Analysis Error
             </strong>
 
             <br><br>
@@ -1485,7 +1485,7 @@
                 >
 
                     <strong>
-                        ℹ️ AI Verification
+                        â„¹ï¸ AI Verification
                     </strong>
 
                     <br><br>
@@ -1745,40 +1745,43 @@
                         </div>
 
 
-                        <!-- SUNLIGHT -->
+                       <!-- SUNLIGHT -->
 
-                        <div class="profile-card">
+<div class="profile-card">
 
-                            <h4>
-                                ☀️ Sunlight
-                            </h4>
+    <h4>
+        ☀️ Sunlight
+    </h4>
 
+    {% if result.plant_profile.sunlight %}
 
-                            {% if result.plant_profile.sunlight %}
+        <ul class="profile-list">
 
-                            <ul class="profile-list">
+            {% if result.plant_profile.sunlight is string %}
 
-                                {% for sun
-                                    in result.plant_profile.sunlight %}
+                <li>
+                    {{ result.plant_profile.sunlight }}
+                </li>
 
-                                <li>
-                                    {{ sun }}
-                                </li>
+            {% else %}
 
-                                {% endfor %}
+                {% for sun in result.plant_profile.sunlight %}
 
-                            </ul>
+                    <li>{{ sun }}</li>
 
-                            {% else %}
+                {% endfor %}
 
-                            <p>
-                                Not available
-                            </p>
+            {% endif %}
 
-                            {% endif %}
+        </ul>
 
-                        </div>
+    {% else %}
 
+        <p>Not available</p>
+
+    {% endif %}
+
+</div>
 
                         <!-- PH -->
 
@@ -1827,7 +1830,7 @@
                         <div class="profile-card">
 
                             <h4>
-                                ☀️ Sunlight Duration
+                                â˜€ï¸ Sunlight Duration
                             </h4>
 
                             <p>
@@ -1894,7 +1897,7 @@
                     <div class="profile-unavailable">
 
                         <strong>
-                            ℹ️ Plant Profile
+                            â„¹ï¸ Plant Profile
                         </strong>
 
                         <br><br>
@@ -1977,7 +1980,7 @@
                     <div class="disease-unavailable">
 
                         <strong>
-                            ℹ️ Disease analysis is not confirmed
+                            â„¹ï¸ Disease analysis is not confirmed
                         </strong>
 
                         <br><br>
@@ -2018,7 +2021,7 @@
                 <div class="disclaimer">
 
                     <strong>
-                        ⚠️ Important:
+                        âš ï¸ Important:
                     </strong>
 
                     AI identification is an automated result

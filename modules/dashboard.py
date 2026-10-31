@@ -1,4 +1,4 @@
-
+﻿
 import subprocess
 import sys
 import time
@@ -259,12 +259,13 @@ def open_plant_scanner():
     try:
         import requests
 
-        url = "http://127.0.0.1:5000"
+        base_url = "http://127.0.0.1:5000"
+        scanner_url = base_url + "/plant-scanner"
         server_running = False
 
         try:
             response = requests.get(
-                url + "/api/status",
+                base_url + "/api/status",
                 timeout=2
             )
             server_running = response.ok
@@ -284,7 +285,7 @@ def open_plant_scanner():
 
                 try:
                     response = requests.get(
-                        url + "/api/status",
+                        base_url + "/api/status",
                         timeout=2
                     )
 
@@ -296,9 +297,9 @@ def open_plant_scanner():
                     continue
 
         if server_running:
-            webbrowser.open(url)
+            webbrowser.open(scanner_url)
             print(Fore.GREEN + "\nAI Plant Scanner browser mein open ho raha hai.")
-            print(Fore.CYAN + "URL: " + url)
+            print(Fore.CYAN + "URL: " + scanner_url)
         else:
             print(Fore.RED + "\nScanner server start nahi hua.")
             print("Terminal mein Flask/API error check karo.")
@@ -307,7 +308,6 @@ def open_plant_scanner():
         print(Fore.RED + f"\nScanner error: {error}")
 
     input("\nPress Enter to return to Admin Dashboard...")
-
 
 # ============================================
 # ADMIN DASHBOARD
@@ -381,3 +381,4 @@ def admin_dashboard():
         else:
             print(Fore.RED + "\nInvalid Choice!")
             input("Press Enter to continue...")
+
